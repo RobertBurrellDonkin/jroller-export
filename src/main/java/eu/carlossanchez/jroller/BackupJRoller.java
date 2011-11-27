@@ -205,6 +205,7 @@ public class BackupJRoller {
 					feed.appendChild(document.importNode(noeud, true));
 				} else {
 					debug("  dropping entry: " + id);
+					debug("      " + previousIds);
 				}
 			}
 			entrees = (NodeList) evaluate(xpeComments, suite,
@@ -217,6 +218,7 @@ public class BackupJRoller {
 					feed.appendChild(document.importNode(noeud, true));
 				} else {
 					debug("  dropping comment for " + id);
+					debug("      " + previousIds);
 				}
 			}
 			previousIds = currentIds;
