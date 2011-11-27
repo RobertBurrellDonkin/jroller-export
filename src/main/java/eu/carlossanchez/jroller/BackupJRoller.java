@@ -92,7 +92,7 @@ public class BackupJRoller {
 		}
 	}
 	
-	private static final String HELP_MESSAGE = "BackupJRoller atom_url [base_filename]";
+	private static final String HELP_MESSAGE = "Usage: <atom url> [base filename]";
 
 	/** Easy way to switch on and off debugging */
 	private static final boolean DEBUG = true;
