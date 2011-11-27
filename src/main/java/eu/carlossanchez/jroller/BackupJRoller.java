@@ -67,6 +67,12 @@ import org.xml.sax.SAXException;
  * @version 1.0
  */
 public class BackupJRoller {
+	
+	//private static final char DATE_SEPARATOR = '/';
+	/** Forms the date URL; may vary. */
+	private static final String DATE_SEPARATOR = "?date=";
+
+	
 	/** Ways that backup can fail */
 	enum FatalError {
 		XPATH(-3),
@@ -155,7 +161,7 @@ public class BackupJRoller {
 				saveURL(url, target);
 				previousNextDate = nextDate;
 				nextDate = nextDate(target);
-				stringURL = stringURLBase + '/' + nextDate;
+				stringURL = stringURLBase + DATE_SEPARATOR + nextDate;
 			} catch (MalformedURLException mue) {
 				FatalError.MALFORMED_URL.die(mue);
 			}
