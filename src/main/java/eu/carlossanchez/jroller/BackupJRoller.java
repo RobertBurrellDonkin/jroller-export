@@ -77,7 +77,8 @@ public class BackupJRoller {
 		TRANSFORMER_CONF(-9),
 		XML_FILE_NOT_FOUND(-10),
 		TRANSFORMER(-11),
-		XML_IO(-12);
+		XML_IO(-12),
+		FAILED_TO_CONNECT(-13);
 
 		private final int code;
 
@@ -85,9 +86,13 @@ public class BackupJRoller {
 			this.code = code;
 		}
 		
-		public void die(Throwable t) {
+		public void die(final Throwable t) {
 			debug(t);
-			System.err.println(t.getMessage());
+			die(t.getMessage());
+		}
+
+		public void die(final String message) {
+			System.err.println(message);
 			System.exit(code);
 		}
 	}
@@ -281,11 +286,10 @@ public class BackupJRoller {
 				bis.close();
 				debug("Content returned is type " + conn.getContent().getClass());
 			} else {
-				throw new RuntimeException("Failed to connect to " + url.toString() + " " + status);
+				FatalError.FAILED_TO_CONNECT.die("Failed to connect to " + url.toString() + " " + status);
 			}
 		} catch (IOException ioe) {
-			throw new RuntimeException("Unrecoverable IO error:"
-					+ ioe.getMessage(), ioe);
+			FatalError.FAILED_TO_CONNECT.die(ioe);
 		}
 	}
 

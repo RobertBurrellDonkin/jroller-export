@@ -1,5 +1,11 @@
 Backup JRoller blogs.
 
+To use:
+ mvn package
+ java -jar target/export-1.0-SNAPSHOT.jar <atom url>
+
+*After* adding the jroller_atom_feed.tpl template.
+
 
 Thanks to Carlos Sanchez "carlos at apache dot org"
 ===================================================
