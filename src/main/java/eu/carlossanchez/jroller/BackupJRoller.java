@@ -67,6 +67,33 @@ import org.xml.sax.SAXException;
  * @version 1.0
  */
 public class BackupJRoller {
+	/** Ways that backup can fail */
+	enum FatalError {
+		XPATH(-3),
+		TARGET_NOT_FOUND(-4),
+		DOM(-5),
+		SAX(-6),
+		IO(-7),
+		TRANSFORMER_CONF(-9),
+		XML_FILE_NOT_FOUND(-10),
+		TRANSFORMER(-11),
+		XML_IO(-12);
+
+		private final int code;
+
+		private FatalError(int code) {
+			this.code = code;
+		}
+		
+		public void die(Throwable t) {
+			debug(t);
+			System.err.println(t.getMessage());
+			System.exit(code);
+		}
+	}
+	
+	private static final String HELP_MESSAGE = "BackupJRoller atom_url [base_filename]";
+
 	/** Easy way to switch on and off debugging */
 	private static final boolean DEBUG = true;
 	
@@ -224,17 +251,13 @@ public class BackupJRoller {
 			flux.close();
 			verbose(leTout + " saved");
 		} catch (TransformerConfigurationException tfe) {
-			System.err.println(tfe.getMessage());
-			System.exit(-9);
+			FatalError.TRANSFORMER_CONF.die(tfe);
 		} catch (FileNotFoundException fnfe) {
-			System.err.println(fnfe.getMessage());
-			System.exit(-10);
+			FatalError.XML_FILE_NOT_FOUND.die(fnfe);
 		} catch (TransformerException te) {
-			System.err.println(te.getMessage());
-			System.exit(-11);
+			FatalError.TRANSFORMER.die(te);
 		} catch (IOException ioe) {
-			System.err.println(ioe.getMessage());
-			System.exit(-12);
+			FatalError.XML_IO.die(ioe);
 		}
 	}
 
@@ -284,8 +307,7 @@ public class BackupJRoller {
 		try {
 			domAnalyseur = fabriqueDOM.newDocumentBuilder();
 		} catch (ParserConfigurationException pce) {
-			System.err.println(pce.getMessage());
-			System.exit(-5);
+			FatalError.DOM.die(pce);
 		}
 
 		XPathFactory xpFactory = XPathFactory.newInstance();
@@ -299,10 +321,7 @@ public class BackupJRoller {
 			xpeCommentParentId = xp
 					.compile("./annotate[@type='comment'][@rel='parent']/text()");
 		} catch (XPathExpressionException xpee) {
-			System.err.println(xpee.getMessage());
-			System.err.println("Static XPath Expression wrong!!");
-			debug(xpee);
-			System.exit(-3);
+			FatalError.XPATH.die(xpee);
 		}
 	}
 
@@ -311,8 +330,7 @@ public class BackupJRoller {
 		try {
 			result = xpe.evaluate(target);
 		} catch (XPathExpressionException xpee) {
-			System.err.println(xpee.getMessage());
-			System.exit(-3);
+			FatalError.XPATH.die(xpee);
 		}
 		return result;
 	}
@@ -323,8 +341,7 @@ public class BackupJRoller {
 		try {
 			result = xpe.evaluate(target, qName);
 		} catch (XPathExpressionException xpee) {
-			System.err.println(xpee.getMessage());
-			System.exit(-3);
+			FatalError.XPATH.die(xpee);
 		}
 		return result;
 	}
@@ -334,14 +351,11 @@ public class BackupJRoller {
 		try {
 			result = domAnalyseur.parse(target);
 		} catch (FileNotFoundException fnfe) {
-			System.err.println(fnfe.getMessage());
-			System.exit(-4);
+			FatalError.TARGET_NOT_FOUND.die(fnfe);
 		} catch (SAXException saxe) {
-			System.err.println(saxe.getMessage());
-			System.exit(-6);
+			FatalError.SAX.die(saxe);
 		} catch (IOException ioe) {
-			System.err.println(ioe.getMessage());
-			System.exit(-7);
+			FatalError.IO.die(ioe);
 		}
 		return result;
 	}
@@ -351,7 +365,7 @@ public class BackupJRoller {
 	}
 
 	private static void dispHelp() {
-		System.out.println("BackupJRoller atom_url [base_filename]");
+		System.out.println(HELP_MESSAGE);
 	}
 
 	private static void verbose(String s) {
@@ -364,9 +378,9 @@ public class BackupJRoller {
 		}
 	}
 
-	private static void debug(Exception e) {
+	private static void debug(Throwable t) {
 		if (DEBUG) {
-			e.printStackTrace();
+			t.printStackTrace();
 		}
 	}
 }
