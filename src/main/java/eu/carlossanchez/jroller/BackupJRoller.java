@@ -146,20 +146,19 @@ public class BackupJRoller {
 		String nextDate = "";
 		String previousNextDate = null;
 		String stringURL = stringURLBase;
-		URL url = null;
 
 		do {
 			try {
-				url = new URL(stringURL);
+				final URL url = new URL(stringURL);
+				final File target = new File(baseFileName + format(++result) + ".xml");
+				verbose("Downloading " + stringURL + " as " + target);
+				saveURL(url, target);
+				previousNextDate = nextDate;
+				nextDate = nextDate(target);
+				stringURL = stringURLBase + '/' + nextDate;
 			} catch (MalformedURLException mue) {
 				FatalError.MALFORMED_URL.die(mue);
 			}
-			File target = new File(baseFileName + format(++result) + ".xml");
-			verbose("Downloading " + stringURL + " as " + target);
-			saveURL(url, target);
-			previousNextDate = nextDate;
-			nextDate = nextDate(target);
-			stringURL = stringURLBase + '/' + nextDate;
 		} while (nextDate != null && nextDate.length() != 0
 				&& !previousNextDate.equals(nextDate));
 
