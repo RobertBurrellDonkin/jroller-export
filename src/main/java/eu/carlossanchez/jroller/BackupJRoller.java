@@ -67,6 +67,10 @@ import org.xml.sax.SAXException;
  * @version 1.0
  */
 public class BackupJRoller {
+	/** Easy way to switch on and off debugging */
+	private static final boolean DEBUG = true;
+	
+	
 	private static XPathExpression xpeLastDate = null;
 	private static XPathExpression xpeEntries = null;
 	private static XPathExpression xpeComments = null;
@@ -139,7 +143,7 @@ public class BackupJRoller {
 		NodeList entrees = (NodeList) evaluate(xpeEntries, document,
 				XPathConstants.NODESET);
 		int nbEntrees = entrees.getLength();
-		// debug(nbEntrees);
+		debug("Number of entries found: " + nbEntrees);
 
 		for (int i = 0; i < nbEntrees; ++i) {
 			String id = evaluate(xpeEntryId, entrees.item(i));
@@ -166,7 +170,7 @@ public class BackupJRoller {
 					 */
 					feed.appendChild(document.importNode(noeud, true));
 				} else {
-					// debug("  dropping " + id);
+					debug("  dropping entry: " + id);
 				}
 			}
 			entrees = (NodeList) evaluate(xpeComments, suite,
@@ -178,7 +182,7 @@ public class BackupJRoller {
 				if (!previousIds.contains(id)) {
 					feed.appendChild(document.importNode(noeud, true));
 				} else {
-					// debug("  dropping comment for " + id);
+					debug("  dropping comment for " + id);
 				}
 			}
 			previousIds = currentIds;
@@ -240,7 +244,7 @@ public class BackupJRoller {
 			int status = conn.getResponseCode();
 
 			if (status == HttpURLConnection.HTTP_OK) {
-				// System.out.println(conn.getContentLength());
+				debug("Connected OK to " + url + "; content length is " + conn.getContentLength());
 				BufferedInputStream bis = new BufferedInputStream(
 						conn.getInputStream());
 				BufferedOutputStream bos = new BufferedOutputStream(
@@ -248,18 +252,17 @@ public class BackupJRoller {
 				final byte[] buffer = new byte[32768];
 				int nbBits = 0;
 				while ((nbBits = bis.read(buffer, 0, buffer.length)) != -1) {
-					// debug(nbBits);
 					bos.write(buffer, 0, nbBits);
 				}
 				bos.close();
 				bis.close();
-				// debug(conn.getContent().getClass());
+				debug("Content returned is type " + conn.getContent().getClass());
 			} else {
-				throw new RuntimeException(url.toString() + " " + status);
+				throw new RuntimeException("Failed to connect to " + url.toString() + " " + status);
 			}
 		} catch (IOException ioe) {
 			throw new RuntimeException("Unrecoverable IO error:"
-					+ ioe.getMessage());
+					+ ioe.getMessage(), ioe);
 		}
 	}
 
@@ -270,7 +273,7 @@ public class BackupJRoller {
 		if ((lastDate != null) && (lastDate.length() > 0))
 			result = lastDate.substring(0, 4) + lastDate.substring(5, 7)
 					+ lastDate.substring(8, 10);
-		// debug(result);
+		debug("Next date " + result);
 
 		return result;
 	}
@@ -298,7 +301,7 @@ public class BackupJRoller {
 		} catch (XPathExpressionException xpee) {
 			System.err.println(xpee.getMessage());
 			System.err.println("Static XPath Expression wrong!!");
-			// xpee.printStackTrace();
+			debug(xpee);
 			System.exit(-3);
 		}
 	}
@@ -355,7 +358,15 @@ public class BackupJRoller {
 		System.out.println(s);
 	}
 
-	private static void debug(Object o) {
-		System.out.println(o);
+	private static void debug(String message) {
+		if (DEBUG) {
+			System.out.println(message);
+		}
+	}
+
+	private static void debug(Exception e) {
+		if (DEBUG) {
+			e.printStackTrace();
+		}
 	}
 }
