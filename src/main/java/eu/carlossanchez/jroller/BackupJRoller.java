@@ -93,6 +93,8 @@ public class BackupJRoller {
 
 		public void die(final String message) {
 			System.err.println(message);
+			System.err.println();
+			System.err.println("Failed.");
 			System.exit(code);
 		}
 	}
