@@ -286,7 +286,7 @@ public class BackupJRoller {
 				bis.close();
 				debug("Content returned is type " + conn.getContent().getClass());
 			} else {
-				FatalError.FAILED_TO_CONNECT.die("Failed to connect to " + url.toString() + " " + status);
+				FatalError.FAILED_TO_CONNECT.die("Connection to " + url.toString() + " failed with status " + status);
 			}
 		} catch (IOException ioe) {
 			FatalError.FAILED_TO_CONNECT.die(ioe);
