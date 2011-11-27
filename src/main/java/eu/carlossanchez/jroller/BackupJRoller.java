@@ -78,7 +78,8 @@ public class BackupJRoller {
 		XML_FILE_NOT_FOUND(-10),
 		TRANSFORMER(-11),
 		XML_IO(-12),
-		FAILED_TO_CONNECT(-13);
+		FAILED_TO_CONNECT(-13),
+		MALFORMED_URL(-14);
 
 		private final int code;
 
@@ -95,6 +96,7 @@ public class BackupJRoller {
 			System.err.println(message);
 			System.err.println();
 			System.err.println("Failed.");
+			dispHelp();
 			System.exit(code);
 		}
 	}
@@ -150,8 +152,7 @@ public class BackupJRoller {
 			try {
 				url = new URL(stringURL);
 			} catch (MalformedURLException mue) {
-				System.err.println(mue.getMessage());
-				dispHelp();
+				FatalError.MALFORMED_URL.die(mue);
 			}
 			File target = new File(baseFileName + format(++result) + ".xml");
 			verbose("Downloading " + stringURL + " as " + target);
