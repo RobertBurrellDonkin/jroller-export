@@ -110,7 +110,7 @@ public class BackupJRoller {
 	private static final String HELP_MESSAGE = "Usage: <atom url> [base filename]";
 
 	/** Easy way to switch on and off debugging */
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false; //true;
 	
 	
 	private static XPathExpression xpeLastDate = null;
